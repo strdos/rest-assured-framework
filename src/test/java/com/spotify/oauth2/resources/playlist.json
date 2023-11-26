@@ -1,0 +1,39 @@
+{
+  "collaborative": false,
+  "description": "Updated playlist description",
+  "external_urls": {
+    "spotify": "https://open.spotify.com/playlist/2WbBqXGoZNMHlLy7GvtrEH"
+  },
+  "followers": {
+    "href": null,
+    "total": 0
+  },
+  "href": "https://api.spotify.com/v1/playlists/2WbBqXGoZNMHlLy7GvtrEH",
+  "id": "2WbBqXGoZNMHlLy7GvtrEH",
+  "images": [],
+  "name": "Updated Playlist 1",
+  "owner": {
+    "display_name": "Eugene",
+    "external_urls": {
+      "spotify": "https://open.spotify.com/user/31mz3gmv65ac3kp7sjiuhnu3hx7i"
+    },
+    "href": "https://api.spotify.com/v1/users/31mz3gmv65ac3kp7sjiuhnu3hx7i",
+    "id": "31mz3gmv65ac3kp7sjiuhnu3hx7i",
+    "type": "user",
+    "uri": "spotify:user:31mz3gmv65ac3kp7sjiuhnu3hx7i"
+  },
+  "primary_color": null,
+  "public": false,
+  "snapshot_id": "NCxkNzRkODVkZDNiOTFiMjY5N2U0Yjc5YjQyMmUwNzliN2IyZjM1ZTU1",
+  "tracks": {
+    "href": "https://api.spotify.com/v1/playlists/2WbBqXGoZNMHlLy7GvtrEH/tracks?offset=0&limit=100",
+    "items": [],
+    "limit": 100,
+    "next": null,
+    "offset": 0,
+    "previous": null,
+    "total": 0
+  },
+  "type": "playlist",
+  "uri": "spotify:playlist:2WbBqXGoZNMHlLy7GvtrEH"
+}
