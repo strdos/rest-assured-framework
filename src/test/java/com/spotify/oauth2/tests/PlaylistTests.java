@@ -1,5 +1,7 @@
 package com.spotify.oauth2.tests;
 
+import com.spotify.oauth2.pojo.Error;
+import com.spotify.oauth2.pojo.Playlist;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.LogDetail;
@@ -10,6 +12,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 public class PlaylistTests {
@@ -37,92 +40,113 @@ public class PlaylistTests {
 
     @Test
     public void create_playlist() {
-        String payload = "{\n" +
-                "    \"name\": \"New Playlist\",\n" +
-                "    \"description\": \"Test description\",\n" +
-                "    \"public\": false\n" +
-                "}";
+        Playlist requestPlaylist = new Playlist();
+        requestPlaylist.setName("Test Playlist");
+        requestPlaylist.setDescription("Test Description");
+        requestPlaylist.setPublic(false);
+
         String user_id = "31mz3gmv65ac3kp7sjiuhnu3hx7i";
-        given(requestSpecification).
-                body(payload).
+
+        Playlist responsePlaylist = given(requestSpecification).
+                body(requestPlaylist).
         when().
                 post("/users/" + user_id + "/playlists").
         then().spec(responseSpecification).
                 assertThat().
                 statusCode(201).
-                body("name", equalTo("New Playlist"),
-                        "description", equalTo("Test description"),
-                        "public", equalTo(false));
+                extract().response().as(Playlist.class);
+
+        assertThat(responsePlaylist.getName(), equalTo(requestPlaylist.getName()));
+        assertThat(responsePlaylist.getDescription(), equalTo(requestPlaylist.getDescription()));
+        assertThat(responsePlaylist.getPublic(), equalTo(requestPlaylist.getPublic()));
+
     }
     @Test
     public void get_playlist() {
+        Playlist requestPlaylist = new Playlist();
+        requestPlaylist.setName("Updated Playlist");
+        requestPlaylist.setDescription("Updated Description");
+        requestPlaylist.setPublic(false);
+
         String playlist_id = "2WbBqXGoZNMHlLy7GvtrEH";
-        given(requestSpecification).
+        Playlist responsePlaylist = given(requestSpecification).
         when().
                 get("/playlists/" + playlist_id).
         then().spec(responseSpecification).
                 assertThat().
-                statusCode(200).
-                body("name", equalTo("Updated Playlist 1"),
-                        "description", equalTo("Updated playlist description"),
-                        "public", equalTo(false));
+                statusCode(201).
+                extract().response().as(Playlist.class);
+
+        assertThat(responsePlaylist.getName(), equalTo(requestPlaylist.getName()));
+        assertThat(responsePlaylist.getDescription(), equalTo(requestPlaylist.getDescription()));
+        assertThat(responsePlaylist.getPublic(), equalTo(requestPlaylist.getPublic()));
     }
     @Test
     public void update_playlist() {
-        String payload = "{\n" +
-                "    \"name\": \"Updated Playlist 1\",\n" +
-                "    \"description\": \"Updated playlist description\",\n" +
-                "    \"public\": false\n" +
-                "}";
+        Playlist requestPlaylist = new Playlist();
+        requestPlaylist.setName("Updated Playlist");
+        requestPlaylist.setDescription("Updated Description");
+        requestPlaylist.setPublic(false);
+
         String playlist_id = "2WbBqXGoZNMHlLy7GvtrEH";
-        given(requestSpecification).
-                body(payload).
+        Playlist responsePlaylist = given(requestSpecification).
+                body(requestPlaylist).
         when().
                 put("/playlists/" + playlist_id).
         then().spec(responseSpecification).
                 assertThat().
-                statusCode(200);
+                statusCode(201).
+                extract().response().as(Playlist.class);
+
+        assertThat(responsePlaylist.getName(), equalTo(requestPlaylist.getName()));
+        assertThat(responsePlaylist.getDescription(), equalTo(requestPlaylist.getDescription()));
+        assertThat(responsePlaylist.getPublic(), equalTo(requestPlaylist.getPublic()));
     }
     @Test
     public void create_playlist_without_name() {
-        String payload = "{\n" +
-                "    \"name\": \"\",\n" +
-                "    \"description\": \"Updated playlist description\",\n" +
-                "    \"public\": false\n" +
-                "}";
+        Playlist requestPlaylist = new Playlist();
+        requestPlaylist.setName("");
+        requestPlaylist.setDescription("Updated Description");
+        requestPlaylist.setPublic(false);
+
         String user_id = "31mz3gmv65ac3kp7sjiuhnu3hx7i";
-        given(requestSpecification).
-                body(payload).
+
+        Error error = given(requestSpecification).
+                body(requestPlaylist).
         when().
                 post("/users/" + user_id + "/playlists").
         then().spec(responseSpecification).
                 assertThat().
                 statusCode(400).
-                body("error.status", equalTo(400),
-                "error.message", equalTo("Missing required field: name"));
+                extract().response().as(Error.class);
+
+        assertThat(error.getError().getStatus(), equalTo(400));
+        assertThat(error.getError().getMessage(), equalTo("Missing required field: name"));
     }
 
     @Test
     public void create_playlist_with_invalid_token() {
-        String payload = "{\n" +
-                "    \"name\": \"Updated Playlist 1\",\n" +
-                "    \"description\": \"Updated playlist description\",\n" +
-                "    \"public\": false\n" +
-                "}";
+        Playlist requestPlaylist = new Playlist();
+        requestPlaylist.setName("Test Playlist");
+        requestPlaylist.setDescription("Test Description");
+        requestPlaylist.setPublic(false);
+
         String user_id = "31mz3gmv65ac3kp7sjiuhnu3hx7i";
-        given().
+        Error error = given().
                 baseUri(baseUri).
                 basePath(basePath).
                 header("Authorization", "Bearer " + "12345_invalid_token").
                 contentType(ContentType.JSON).
                 log().all().
-                body(payload).
+                body(requestPlaylist).
         when().
                 post("/users/" + user_id + "/playlists").
         then().spec(responseSpecification).
                 assertThat().
                 statusCode(401).
-                body("error.status", equalTo(401),
-                        "error.message", equalTo("Invalid access token"));
+                extract().response().as(Error.class);
+
+        assertThat(error.getError().getStatus(), equalTo(401));
+        assertThat(error.getError().getMessage(), equalTo("Invalid access token"));
     }
 }
