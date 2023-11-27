@@ -1,12 +1,14 @@
 package com.spotify.oauth2.tests;
 
 import com.spotify.oauth2.api.SpecBuilder;
+import com.spotify.oauth2.api.applicationApi.PlaylistApi;
 import com.spotify.oauth2.pojo.Error;
 import com.spotify.oauth2.pojo.Playlist;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
 import org.testng.annotations.BeforeClass;
@@ -29,21 +31,14 @@ public class PlaylistTests {
                 setDescription("Test Description").
                 setPublic(false);
 
-        String user_id = "31mz3gmv65ac3kp7sjiuhnu3hx7i";
+        Response response = PlaylistApi.post(requestPlaylist);
+        assertThat(response.statusCode(), equalTo(201));
 
-        Playlist responsePlaylist = given(getRequestSpec()).
-                body(requestPlaylist).
-        when().
-                post("/users/" + user_id + "/playlists").
-        then().spec(getResponseSpec()).
-                assertThat().
-                statusCode(201).
-                extract().response().as(Playlist.class);
+        Playlist responsePlaylist = response.as(Playlist.class);
 
         assertThat(responsePlaylist.getName(), equalTo(requestPlaylist.getName()));
         assertThat(responsePlaylist.getDescription(), equalTo(requestPlaylist.getDescription()));
         assertThat(responsePlaylist.getPublic(), equalTo(requestPlaylist.getPublic()));
-
     }
     @Test
     public void get_playlist() {
@@ -53,13 +48,11 @@ public class PlaylistTests {
                 setPublic(false);
 
         String playlist_id = "2WbBqXGoZNMHlLy7GvtrEH";
-        Playlist responsePlaylist = given(getRequestSpec()).
-        when().
-                get("/playlists/" + playlist_id).
-        then().spec(getResponseSpec()).
-                assertThat().
-                statusCode(200).
-                extract().response().as(Playlist.class);
+
+        Response response = PlaylistApi.get(playlist_id);
+        assertThat(response.statusCode(), equalTo(200));
+
+        Playlist responsePlaylist = response.as(Playlist.class);
 
         assertThat(responsePlaylist.getName(), equalTo(requestPlaylist.getName()));
         assertThat(responsePlaylist.getDescription(), equalTo(requestPlaylist.getDescription()));
@@ -80,13 +73,9 @@ public class PlaylistTests {
                 setPublic(false);
 
         String playlist_id = "2WbBqXGoZNMHlLy7GvtrEH";
-        given(getRequestSpec()).
-                body(requestPlaylist).
-        when().
-                put("/playlists/" + playlist_id).
-        then().spec(getResponseSpec()).
-                assertThat().
-                statusCode(200);
+
+        Response response = PlaylistApi.update(playlist_id, requestPlaylist);
+        assertThat(response.statusCode(), equalTo(200));
     }
     @Test
     public void create_playlist_without_name() {
@@ -97,14 +86,10 @@ public class PlaylistTests {
 
         String user_id = "31mz3gmv65ac3kp7sjiuhnu3hx7i";
 
-        Error error = given(getRequestSpec()).
-                body(requestPlaylist).
-        when().
-                post("/users/" + user_id + "/playlists").
-        then().spec(getResponseSpec()).
-                assertThat().
-                statusCode(400).
-                extract().response().as(Error.class);
+        Response response = PlaylistApi.post(requestPlaylist);
+        assertThat(response.statusCode(), equalTo(400));
+
+        Error error = response.as(Error.class);
 
         assertThat(error.getError().getStatus(), equalTo(400));
         assertThat(error.getError().getMessage(), equalTo("Missing required field: name"));
@@ -112,25 +97,20 @@ public class PlaylistTests {
 
     @Test
     public void create_playlist_with_invalid_token() {
+
+        String invalid_token = "12345_invalid_token";
+
         Playlist requestPlaylist = new Playlist().
                 setName("Test Playlist").
                 setDescription("Test Description").
                 setPublic(false);
 
         String user_id = "31mz3gmv65ac3kp7sjiuhnu3hx7i";
-        Error error = given().
-                baseUri(SpecBuilder.baseUri).
-                basePath(basePath).
-                header("Authorization", "Bearer " + "12345_invalid_token").
-                contentType(ContentType.JSON).
-                log().all().
-                body(requestPlaylist).
-        when().
-                post("/users/" + user_id + "/playlists").
-        then().spec(getResponseSpec()).
-                assertThat().
-                statusCode(401).
-                extract().response().as(Error.class);
+
+        Response response = PlaylistApi.post(invalid_token, requestPlaylist);
+        assertThat(response.statusCode(), equalTo(401));
+
+        Error error = response.as(Error.class);
 
         assertThat(error.getError().getStatus(), equalTo(401));
         assertThat(error.getError().getMessage(), equalTo("Invalid access token"));
