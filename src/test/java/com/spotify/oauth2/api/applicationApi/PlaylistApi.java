@@ -2,6 +2,7 @@ package com.spotify.oauth2.api.applicationApi;
 
 import com.spotify.oauth2.api.RestResource;
 import com.spotify.oauth2.pojo.Playlist;
+import com.spotify.oauth2.utils.ConfigLoader;
 import io.restassured.response.Response;
 
 import static com.spotify.oauth2.api.Route.PLAYLISTS;
@@ -16,12 +17,13 @@ public class PlaylistApi {
     //String playlist_id = "2WbBqXGoZNMHlLy7GvtrEH";
     public static Response post(Playlist requestPlaylist) {
 
-        return RestResource.post(USERS + user_id + PLAYLISTS, getToken(), requestPlaylist);
+        return RestResource.post(USERS + ConfigLoader.getInstance().getUserId() + PLAYLISTS, getToken(), requestPlaylist);
     }
 
     public static Response post(String token, Playlist requestPlaylist) {
 
-        return RestResource.post(USERS + user_id + PLAYLISTS, token, requestPlaylist);
+        //return RestResource.post(USERS + "/" + ConfigLoader.getInstance().getUserId() + PLAYLISTS, token, requestPlaylist);
+        return RestResource.post(USERS + ConfigLoader.getInstance().getUserId() + PLAYLISTS, token, requestPlaylist);
     }
 
     public static Response get(String playlistId) {
