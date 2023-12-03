@@ -4,6 +4,7 @@ import com.spotify.oauth2.api.SpecBuilder;
 import com.spotify.oauth2.api.applicationApi.PlaylistApi;
 import com.spotify.oauth2.pojo.Error;
 import com.spotify.oauth2.pojo.Playlist;
+import com.spotify.oauth2.utils.DataLoader;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.LogDetail;
@@ -47,9 +48,7 @@ public class PlaylistTests {
                 setDescription("Updated Description").
                 setPublic(false);
 
-        String playlist_id = "2WbBqXGoZNMHlLy7GvtrEH";
-
-        Response response = PlaylistApi.get(playlist_id);
+        Response response = PlaylistApi.get(DataLoader.getInstance().getGetPlaylistId());
         assertThat(response.statusCode(), equalTo(200));
 
         Playlist responsePlaylist = response.as(Playlist.class);
@@ -72,9 +71,7 @@ public class PlaylistTests {
                 setDescription("Updated Description").
                 setPublic(false);
 
-        String playlist_id = "2WbBqXGoZNMHlLy7GvtrEH";
-
-        Response response = PlaylistApi.update(playlist_id, requestPlaylist);
+        Response response = PlaylistApi.update(DataLoader.getInstance().getUpdatePlaylistId(), requestPlaylist);
         assertThat(response.statusCode(), equalTo(200));
     }
     @Test
@@ -83,8 +80,6 @@ public class PlaylistTests {
                 setName("").
                 setDescription("Updated Description").
                 setPublic(false);
-
-        String user_id = "31mz3gmv65ac3kp7sjiuhnu3hx7i";
 
         Response response = PlaylistApi.post(requestPlaylist);
         assertThat(response.statusCode(), equalTo(400));
@@ -104,8 +99,6 @@ public class PlaylistTests {
                 setName("Test Playlist").
                 setDescription("Test Description").
                 setPublic(false);
-
-        String user_id = "31mz3gmv65ac3kp7sjiuhnu3hx7i";
 
         Response response = PlaylistApi.post(invalid_token, requestPlaylist);
         assertThat(response.statusCode(), equalTo(401));
