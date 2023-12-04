@@ -5,6 +5,7 @@ import com.spotify.oauth2.api.applicationApi.PlaylistApi;
 import com.spotify.oauth2.pojo.Error;
 import com.spotify.oauth2.pojo.Playlist;
 import com.spotify.oauth2.utils.DataLoader;
+import io.qameta.allure.*;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.filter.log.LogDetail;
@@ -22,8 +23,11 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
+@Epic("Spotify Oauth 2.0")
+@Feature("Playlist API")
 public class PlaylistTests {
 
+    @Step
     public Playlist playlistBuilder(String name, String description, boolean _public) {
 
 /*        Playlist playlist = new Playlist();
@@ -39,6 +43,7 @@ public class PlaylistTests {
                 build();
     }
 
+    @Step
     public void assertPlaylistEqual(Playlist responsePlaylist, Playlist requestPlaylist) {
 
         assertThat(responsePlaylist.getName(), equalTo(requestPlaylist.getName()));
@@ -47,16 +52,24 @@ public class PlaylistTests {
         assertThat(responsePlaylist.get_public(), equalTo(requestPlaylist.get_public()));
     }
 
+    @Step
     public void assertStatusCode(int actualStatusCode, int expectedStatusCode) {
         assertThat(actualStatusCode, equalTo(expectedStatusCode));
     }
 
+    @Step
     public void assertError(Error responseErr, int expectedStatusCode, String expectedMsg) {
 
         assertThat(responseErr.getError().getStatus(), equalTo(expectedStatusCode));
         assertThat(responseErr.getError().getMessage(), equalTo(expectedMsg));
     }
 
+    @Story("Create a playlist story")
+    @Link("https://example.org")
+    @Link(name="allure", type="mylink")
+    @TmsLink("12345")
+    @Issue("12345")
+    @Description("create a playlist")
     @Test
     public void create_playlist() {
 
@@ -90,6 +103,7 @@ public class PlaylistTests {
         Response response = PlaylistApi.update(DataLoader.getInstance().getUpdatePlaylistId(), requestPlaylist);
         assertStatusCode(response.statusCode(), 200);
     }
+    @Story("Create a playlist story")
     @Test
     public void create_playlist_without_name() {
         Playlist requestPlaylist = playlistBuilder("", "Updated Description", false);
@@ -102,6 +116,7 @@ public class PlaylistTests {
         assertError(error, 400, "Missing required field: name");
     }
 
+    @Story("Create a playlist story")
     @Test
     public void create_playlist_with_invalid_token() {
 
