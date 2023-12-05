@@ -18,6 +18,7 @@ public class SpecBuilder {
     public static RequestSpecification getRequestSpec() {
 
         return new RequestSpecBuilder().
+                //setBaseUri(System.getProperty("BASE_URI")).  //to use with mvn for multiple stands (mvn test -DBASE_URI="https://api.spotify.com")
                 setBaseUri(baseUri).
                 setBasePath(basePath).
                 setContentType(ContentType.JSON).
@@ -29,6 +30,7 @@ public class SpecBuilder {
     public static RequestSpecification getAccountRequestSpec() {
 
         return new RequestSpecBuilder().
+                //setBaseUri(System.getProperty("ACCOUNT_BASE_URI")).
                 setBaseUri(baseUriAccounts).
                 setContentType(ContentType.URLENC).
                 addFilter(new AllureRestAssured()).
